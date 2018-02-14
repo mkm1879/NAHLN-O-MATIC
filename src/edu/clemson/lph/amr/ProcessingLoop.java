@@ -17,6 +17,8 @@ package edu.clemson.lph.amr;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import org.apache.log4j.Logger;
 
 import edu.clemson.lph.amr.exceptions.ConfigException;
@@ -55,7 +57,24 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 
 	@Override
 	public void run() {
-		// TODO wrap in a while not canceled loop.
+		try {
+			String os = System.getProperty("os.name");
+			if( os.toLowerCase().contains("mac os") ) {
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+						"Civet");
+				System.setProperty("com.apple.mrj.application.growbox.intrudes",
+						"false");
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			}
+			else {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
+		} 
+		catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
 		try {
 			while( !bCancel ) {
 				synchronized (this) {

@@ -175,7 +175,7 @@ public class ProgressDialog extends JDialog {
 	    panel1.add(lProgress);
 	    
 	    btnCancel = new JButton("Cancel");
-	    btnCancel.setBounds(196, 154, 91, 23);
+	    btnCancel.setBounds(168, 150, 91, 23);
 	    panel1.add(btnCancel);
 	    btnCancel.addActionListener(new ActionListener() {
 			@Override
