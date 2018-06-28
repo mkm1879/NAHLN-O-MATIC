@@ -33,13 +33,14 @@ import edu.clemson.lph.amr.exceptions.HL7Exception;
 /**
  * 
  */
-public class NAHLNPostSender {
+public class NAHLNPostSender implements Sender {
 	public static final Logger logger = Logger.getLogger(NahlnOMaticAMR.class.getName());
 	
 	public NAHLNPostSender() {
 		
 	}
 	
+	@Override
 	public String send( String sMsg ) throws HL7Exception, ConfigException, IOException {
 		HttpClient client = HttpClientBuilder.create().build();
 		String sURI = ConfigFile.getHost();

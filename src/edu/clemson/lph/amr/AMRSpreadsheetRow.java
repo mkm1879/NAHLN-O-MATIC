@@ -41,10 +41,13 @@ public class AMRSpreadsheetRow {
 		String sHeadAb = headers.get(iCol);
 		while( sHeadAb != null && sHeadAb.trim().length() > 0 && iCol < headers.size() - 1 ) {
 			String sAntibiotic = headers.get(iCol+1);
-			String sMIC = row.getCell(iCol+1).getStringCellValue();
-			String sInterpretation = row.getCell(iCol+2).getStringCellValue();
-			AMRResult res = new AMRResult(sAntibiotic, sMIC, sInterpretation);
-			results.add(res);
+			Cell cMIC = row.getCell(iCol+1);
+			if( cMIC != null ) {
+				String sMIC = row.getCell(iCol+1).toString();
+				String sInterpretation = row.getCell(iCol+2).getStringCellValue();
+				AMRResult res = new AMRResult(sAntibiotic, sMIC, sInterpretation);
+				results.add(res);
+			}
 			iCol += 3;
 			if( iCol >= headers.size() )
 				break;
@@ -59,7 +62,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Laboratory Name") )
 			throw new ConfigException("Laboratory Name not found in column A");
 		Cell c = row.getCell(0);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 	
@@ -69,7 +73,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Unique Specimen ID") )
 			throw new ConfigException("Unique Specimen ID not found in column B");
 		Cell c = row.getCell(1);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 	
@@ -79,7 +84,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("State of Animal Origin") )
 			throw new ConfigException("State of Animal Origin not found in column C");
 		Cell c = row.getCell(2);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 	
@@ -89,7 +95,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Animal Species") )
 			throw new ConfigException("Animal Species not found in column D");
 		Cell c = row.getCell(3);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 
@@ -99,7 +106,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Reason for submission ") )
 			throw new ConfigException("Reason for submission  not found in column E");
 		Cell c = row.getCell(4);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 
@@ -109,7 +117,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Program Name") )
 			throw new ConfigException("Program Name not found in column F");
 		Cell c = row.getCell(5);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 
@@ -119,7 +128,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Specimen") )
 			throw new ConfigException("Specimen not found in column G");
 		Cell c = row.getCell(6);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 
@@ -129,7 +139,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Bacterial Organism Isolated") )
 			throw new ConfigException("Bacterial Organism Isolated not found in column H");
 		Cell c = row.getCell(7);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 	public String getSalmonellaSerotype() throws ConfigException {
@@ -138,7 +149,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Salmonella Serotype") )
 			throw new ConfigException("Salmonella Serotype not found in column I");
 		Cell c = row.getCell(8);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 
@@ -148,7 +160,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Final Diagnosis") )
 			throw new ConfigException("Final Diagnosis not found in column J");
 		Cell c = row.getCell(9);
-		sRet = c.getStringCellValue();
+		if( c != null )
+			sRet = c.toString();
 		return sRet;
 	}
 
@@ -158,11 +171,13 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Date of Isolation") )
 			throw new ConfigException("Date of Isolation not found in column K");
 		Cell c = row.getCell(10);
-		try {
-			Double dVal = c.getNumericCellValue();
-			dRet = DateUtil.getJavaDate(dVal);
-		} catch(Exception e) {
-			throw new ConfigException("Date field not valid date");
+		if( c != null ) {
+			try {
+				Double dVal = c.getNumericCellValue();
+				dRet = DateUtil.getJavaDate(dVal);
+			} catch(Exception e) {
+				throw new ConfigException("Date field not valid date");
+			}
 		}
 		return dRet;
 	}

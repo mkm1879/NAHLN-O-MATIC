@@ -40,7 +40,7 @@ import edu.clemson.lph.amr.exceptions.HL7Exception;
 /**
  * 
  */
-public class SHICPostSender {
+public class SHICPostSender implements Sender {
 	public static final Logger logger = Logger.getLogger(NahlnOMaticAMR.class.getName());
 
 	/**
@@ -50,7 +50,7 @@ public class SHICPostSender {
 		// TODO Auto-generated constructor stub
 	}
 
-
+	@Override
 	public String send( String sMsg ) throws HL7Exception, ConfigException, IOException {
 	    SSLContextBuilder builder = null;
 	    StringBuffer result = null;
@@ -61,9 +61,10 @@ public class SHICPostSender {
 	    			builder.build());
 	    	CloseableHttpClient client = HttpClients.custom().setSSLSocketFactory(
 	    			sslsf).build();
-	    	String sURI = ConfigFile.getSHICHost();
+	    	String sURI = ConfigFile.getHost();
 	    	HttpPost post = new HttpPost(sURI);
 	    	post.addHeader("api-key", ConfigFile.getSHICApiKey());
+	    	post.addHeader("content-type","application/xml");
 	    	post.setEntity(new StringEntity(sMsg, ContentType.TEXT_XML));
 	    	HttpResponse response = null;
 	    	

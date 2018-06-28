@@ -116,7 +116,15 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 	}
 	
 	private void step() {
-		NAHLNPostSender sender = new NAHLNPostSender();
+		Sender sender = null;
+		try {
+			if(ConfigFile.isSHICHost() )
+				sender = new SHICPostSender();
+			else
+				sender = new NAHLNPostSender();
+		} catch (ConfigException e1) {
+			logger.error(e1);
+		}
 		File fDirIn = new File(sInbox);
 		File fDirOut = new File(sOutbox);
 		File fDirErrors = new File(sErrorsbox);

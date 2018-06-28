@@ -212,11 +212,13 @@ public class ConfigFile {
 	}
 	
 	
-	public static String getSHICHost() throws ConfigException {
+	public static boolean isSHICHost() throws ConfigException {
+		boolean bRet = false;
 		readConfig();
-		String sRet = (String)props.get("SHICHost");
+		String sRet = (String)props.get("Host");
 		if( sRet == null ) throw new ConfigException("Missing SHICHost value");
-		return sRet;
+		if( sRet.contains("iastate.edu") ) bRet = true;
+		return bRet;
 	}
 	
 	public static String getProfileID() throws ConfigException {
