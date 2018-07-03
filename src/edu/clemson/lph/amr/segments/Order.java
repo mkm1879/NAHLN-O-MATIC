@@ -21,6 +21,7 @@ import edu.clemson.lph.amr.AMRResult;
 import edu.clemson.lph.amr.AMRSpreadsheetRow;
 import edu.clemson.lph.amr.ConfigFile;
 import edu.clemson.lph.amr.HL7Object;
+import edu.clemson.lph.amr.NahlnOMaticAMR;
 import edu.clemson.lph.amr.datatypes.CWE;
 import edu.clemson.lph.amr.datatypes.DateTime;
 import edu.clemson.lph.amr.datatypes.EI;
@@ -54,6 +55,7 @@ public class Order extends HL7Object {
 		CWE obr4 = lmap.getCWE(doc, "OBR.4", "C and S Panel");
 		obr.appendChild(obr4.toElement());
 		Element obr22 = doc.createElement("OBR.22");
+		NahlnOMaticAMR.setCurrentColumn("DateOfIsolation");		
 		obr22.setTextContent(DateTime.formatDate(row.getDateofIsolation(), false));
 		obr.appendChild(obr22);
 		LocalMap local = new LocalMap();
@@ -64,6 +66,7 @@ public class Order extends HL7Object {
 		Element orc1 = doc.createElement("ORC.1");
 		orc1.setTextContent("SC");
 		orc.appendChild(orc1);
+		NahlnOMaticAMR.setCurrentColumn("SpecimenID");
 		EI orc4 = new EI(doc, "ORC.4", row.getUniqueSpecimenID(), ConfigFile.getProgramOID(), "ISO");
 		orc.appendChild(orc4.toElement());
 		Element orc5 = doc.createElement("ORC.5");

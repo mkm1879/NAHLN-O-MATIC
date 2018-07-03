@@ -22,6 +22,7 @@ import edu.clemson.lph.amr.AMRResult;
 import edu.clemson.lph.amr.AMRSpreadsheetRow;
 import edu.clemson.lph.amr.ConfigFile;
 import edu.clemson.lph.amr.HL7Object;
+import edu.clemson.lph.amr.NahlnOMaticAMR;
 import edu.clemson.lph.amr.datatypes.CWE;
 import edu.clemson.lph.amr.datatypes.DateTime;
 import edu.clemson.lph.amr.datatypes.EI;
@@ -82,6 +83,7 @@ public class Result extends HL7Object {
 		obx11.setTextContent("F");
 		obx.appendChild(obx11);
 		Element obx19 = doc.createElement("OBX.19");
+		NahlnOMaticAMR.setCurrentColumn("DateTested");
 		obx19.setTextContent(DateTime.formatDate(row.getDateTested(), false));
 		obx.appendChild(obx19);
 		EI obx21 = new EI(doc, "OBX.21", UniqueID.getUniqueID("Result"), ConfigFile.getNahlnOMaticOID(), "ISO" );
@@ -110,12 +112,17 @@ public class Result extends HL7Object {
 		obx4.setTextContent("1");  // AMR only one isolate per message.
 		obx.appendChild(obx4);
 		SnomedMap snomed = new SnomedMap();
-		CWE obx5 = snomed.getCWE(doc, "OBX.5", row.getBacterialOrganismIsolated(), row.getSalmonellaSerotype());
+		NahlnOMaticAMR.setCurrentColumn("BacteriaIsolated");
+		String sBact = row.getBacterialOrganismIsolated();
+		NahlnOMaticAMR.setCurrentColumn("SalmonellaSerotype");
+		String sSal = row.getSalmonellaSerotype();
+		CWE obx5 = snomed.getCWE(doc, "OBX.5", sBact, sSal );
 		obx.appendChild(obx5.toElement());
 		Element obx11 = doc.createElement("OBX.11");
 		obx11.setTextContent("F");
 		obx.appendChild(obx11);
 		Element obx19 = doc.createElement("OBX.19");
+		NahlnOMaticAMR.setCurrentColumn("DateOfIsolation");
 		obx19.setTextContent(DateTime.formatDate(row.getDateofIsolation(), false));
 		obx.appendChild(obx19);
 		EI obx21 = new EI(doc, "OBX.21", UniqueID.getUniqueID("Result"), ConfigFile.getNahlnOMaticOID(), "ISO" );

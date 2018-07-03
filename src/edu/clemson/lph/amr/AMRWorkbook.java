@@ -133,7 +133,5 @@ public class AMRWorkbook {
 	public AMRSpreadsheetRow getCurrentRow() {
 		return currentRow;
 	}
-	
-
 
 }

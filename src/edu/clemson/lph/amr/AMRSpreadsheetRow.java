@@ -16,16 +16,20 @@ package edu.clemson.lph.amr;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 
 import edu.clemson.lph.amr.exceptions.ConfigException;
+import edu.clemson.lph.dialogs.MessageDialog;
+import edu.clemson.lph.utils.FileUtils;
 
 /**
  * 
  */
 public class AMRSpreadsheetRow {
+	public static final Logger logger = Logger.getLogger(NahlnOMaticAMR.class.getName());
 	private Row row;
 	private ArrayList<String> headers;
 	private ArrayList<AMRResult> results;
@@ -38,12 +42,16 @@ public class AMRSpreadsheetRow {
 		this.headers = headers;
 		this.results = new ArrayList<AMRResult>();
 		int iCol = 12;
+		try {
 		String sHeadAb = headers.get(iCol);
 		while( sHeadAb != null && sHeadAb.trim().length() > 0 && iCol < headers.size() - 1 ) {
 			String sAntibiotic = headers.get(iCol+1);
+			NahlnOMaticAMR.setCurrentColumn(sAntibiotic);
 			Cell cMIC = row.getCell(iCol+1);
 			if( cMIC != null ) {
+				NahlnOMaticAMR.setCurrentColumn(sAntibiotic + " MIC");
 				String sMIC = row.getCell(iCol+1).toString();
+				NahlnOMaticAMR.setCurrentColumn(sAntibiotic + " Interp");
 				String sInterpretation = row.getCell(iCol+2).getStringCellValue();
 				AMRResult res = new AMRResult(sAntibiotic, sMIC, sInterpretation);
 				results.add(res);
@@ -52,6 +60,18 @@ public class AMRSpreadsheetRow {
 			if( iCol >= headers.size() )
 				break;
 			sHeadAb = headers.get(iCol);
+		}
+		} catch( Throwable e ) {
+			logger.error("Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
+					+ "\r\n Error: " + e.getMessage()
+					+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
+					+ "\r\n Row:\r\n" + NahlnOMaticAMR.getCurrentRow().toString(), e);
+			MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
+					+ "\r\n Error: " + e.getMessage()
+					+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
+					+ "\r\n Column: " + NahlnOMaticAMR.getCurrentColumn()
+					+ "\r\n Row:\r\n" + NahlnOMaticAMR.getCurrentRow().toString() );
+			e.printStackTrace();
 		}
 	}
 
@@ -199,6 +219,27 @@ public class AMRSpreadsheetRow {
 	
 	public ArrayList<AMRResult> getResults() {
 		return results;
+	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		int iCol = 0;
+		String sHeadAb = headers.get(iCol);
+		while( sHeadAb != null && sHeadAb.trim().length() > 0 && iCol < headers.size() ) {
+			sb.append(headers.get(iCol));
+			sb.append('=');
+			Cell cell = row.getCell(iCol);
+			if( cell != null ) {
+				sb.append(cell.toString());
+			}
+			else {
+				sb.append("NULL");
+			}
+			sb.append("\r\n");
+			sHeadAb = headers.get(++iCol);
+		}
+
+		return sb.toString();
 	}
 
 }

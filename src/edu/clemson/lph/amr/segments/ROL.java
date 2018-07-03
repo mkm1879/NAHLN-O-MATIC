@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
 import edu.clemson.lph.amr.AMRWorkbook;
 import edu.clemson.lph.amr.AMRSpreadsheetRow;
 import edu.clemson.lph.amr.HL7Object;
+import edu.clemson.lph.amr.NahlnOMaticAMR;
 import edu.clemson.lph.amr.datatypes.CWE;
 import edu.clemson.lph.amr.exceptions.ConfigException;
 import edu.clemson.lph.amr.exceptions.XMLException;
@@ -70,6 +71,7 @@ public class ROL extends HL7Object {
 	}
 	
 	private String getState() throws ConfigException {
+		NahlnOMaticAMR.setCurrentColumn("StateOfOrigin");
 		String sRet = row.getStateofAnimalOrigin();
 		return sRet;
 	}	

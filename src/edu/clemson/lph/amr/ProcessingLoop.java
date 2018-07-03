@@ -130,16 +130,20 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 		File fDirErrors = new File(sErrorsbox);
 		for( File fFile : fDirIn.listFiles() ) {
 			try {
+				NahlnOMaticAMR.setCurrentFile(fFile);
 				updateProgress("Reading " + fFile.getName(), "Progress ...");
 				pause();
 				AMRWorkbook sheet = new AMRWorkbook(fFile);
+				NahlnOMaticAMR.setCurrentSheet(sheet);
 				boolean bHasErrors = false;
 				while( sheet.hasNextSheet() ) {
 					sheet.nextSheet();
+					NahlnOMaticAMR.setCurrentTab(sheet.getCurrentSheetName());
 					while( sheet.hasNextRow() ) {
 						AMRSpreadsheetRow row = sheet.nextRow();
+						NahlnOMaticAMR.setCurrentRow(row);
+						
 						OpuR25Document opu = new OpuR25Document(row);
-						//TODO Send and receive response
 						String sMsg = opu.toXMLString();
 						String sID = opu.getUniqueSpecimen();
 						updateProgress("Sending " + fFile.getName() + "_" + sID, "Progress ...");
@@ -168,9 +172,16 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 					FileUtils.move( fFile, fDirErrors );
 				else
 					FileUtils.move( fFile, fDirOut );
-			} catch (XMLException | ConfigException | HL7Exception | IOException   e) {
-				logger.error("Error in main loop while processing " + fFile.getName(), e);
-				MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Error in main loop while processing " + fFile.getName() );
+			} catch (Throwable e) {
+				logger.error("Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName()
+						+ "\r\n Error: " + e.getMessage()
+						+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
+						+ "\r\n Row:\r\n" + NahlnOMaticAMR.getCurrentRow().toString(), e);
+				MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
+						+ "\r\n Error: " + e.getMessage()
+						+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
+						+ "\r\n Column: " + NahlnOMaticAMR.getCurrentColumn()
+						+ "\r\n Row:\r\n" + NahlnOMaticAMR.getCurrentRow().toString() );
 				e.printStackTrace();
 				FileUtils.move( fFile, fDirErrors );
 			}

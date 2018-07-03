@@ -15,9 +15,12 @@
  */
 package edu.clemson.lph.amr;
 
+import java.io.File;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.poi.ss.usermodel.Row;
 
 import edu.clemson.lph.amr.exceptions.ConfigException;
 import edu.clemson.lph.amr.mappings.LoincMap;
@@ -34,6 +37,44 @@ public class NahlnOMaticAMR {
 	
 	public static SnomedMap snomedMap;
 	public static LoincMap loincMap;
+	
+	// Static properties just to track status for logging
+	public static AMRSpreadsheetRow currentRow;
+	public static void setCurrentRow( AMRSpreadsheetRow row ) {
+		currentRow = row;
+	}
+	public static AMRSpreadsheetRow getCurrentRow() {
+		return currentRow;
+	}
+	public static File currentFile;
+	public static void setCurrentFile( File File ) {
+		currentFile = File;
+	}
+	public static File getCurrentFile() {
+		return currentFile;
+	}
+	public static AMRWorkbook currentSheet;
+	public static void setCurrentSheet( AMRWorkbook sheet ) {
+		currentSheet = sheet;
+	}
+	public static AMRWorkbook getCurrentSheet() {
+		return currentSheet;
+	}
+	public static String currentTab;
+	public static void setCurrentTab( String sTab ) {
+		currentTab = sTab;
+	}
+	public static String getCurrentTab() {
+		return currentTab;
+	}
+	public static String currentColumn;
+	public static void setCurrentColumn( String sColumn ) {
+		currentColumn = sColumn;
+	}
+	public static String getCurrentColumn() {
+		return currentColumn;
+	}
+	
 
 	/**
 	 * @param args

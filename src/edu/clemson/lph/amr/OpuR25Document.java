@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.clemson.lph.amr.exceptions.ConfigException;
+import edu.clemson.lph.amr.exceptions.DataException;
 import edu.clemson.lph.amr.exceptions.XMLException;
 import edu.clemson.lph.amr.segments.AccDetail;
 import edu.clemson.lph.amr.segments.MSH;
@@ -48,7 +49,7 @@ public class OpuR25Document extends HL7Object {
 	 * @throws XMLException 
 	 * 
 	 */
-	public OpuR25Document(AMRSpreadsheetRow row ) throws XMLException, ConfigException {
+	public OpuR25Document(AMRSpreadsheetRow row ) throws XMLException, ConfigException, DataException {
 		super();
 		this.row = row;
 		DocumentBuilder db = null;
@@ -90,12 +91,12 @@ public class OpuR25Document extends HL7Object {
 		me.appendChild(pv1.toElement());
 	}
 	
-	private void addROL() throws XMLException, ConfigException {
+	private void addROL() throws XMLException, ConfigException, DataException {
 		ROL rol = new ROL(doc, row, "PREM" );
 		me.appendChild(rol.toElement());
 	}
 	
-	private void addAccDetail() throws XMLException, ConfigException {
+	private void addAccDetail() throws XMLException, ConfigException, DataException {
 		det = new AccDetail(doc, row);
 		me.appendChild(det.toElement());
 	}
@@ -111,6 +112,7 @@ public class OpuR25Document extends HL7Object {
 
 	public String getUniqueSpecimen() throws ConfigException {
 		String sRet = null;
+		NahlnOMaticAMR.setCurrentColumn("Specimen ID");
 		sRet = row.getUniqueSpecimenID();
 		return sRet;
 	}
