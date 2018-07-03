@@ -83,7 +83,7 @@ public class Result extends HL7Object {
 		obx11.setTextContent("F");
 		obx.appendChild(obx11);
 		Element obx19 = doc.createElement("OBX.19");
-		NahlnOMaticAMR.setCurrentColumn("DateTested");
+		NahlnOMaticAMR.setCurrentColumn("Date Tested");
 		obx19.setTextContent(DateTime.formatDate(row.getDateTested(), false));
 		obx.appendChild(obx19);
 		EI obx21 = new EI(doc, "OBX.21", UniqueID.getUniqueID("Result"), ConfigFile.getNahlnOMaticOID(), "ISO" );
@@ -112,9 +112,9 @@ public class Result extends HL7Object {
 		obx4.setTextContent("1");  // AMR only one isolate per message.
 		obx.appendChild(obx4);
 		SnomedMap snomed = new SnomedMap();
-		NahlnOMaticAMR.setCurrentColumn("BacteriaIsolated");
+		NahlnOMaticAMR.setCurrentColumn("Bacteria Isolated");
 		String sBact = row.getBacterialOrganismIsolated();
-		NahlnOMaticAMR.setCurrentColumn("SalmonellaSerotype");
+		NahlnOMaticAMR.setCurrentColumn("Salmonella Serotype");
 		String sSal = row.getSalmonellaSerotype();
 		CWE obx5 = snomed.getCWE(doc, "OBX.5", sBact, sSal );
 		obx.appendChild(obx5.toElement());
@@ -122,7 +122,7 @@ public class Result extends HL7Object {
 		obx11.setTextContent("F");
 		obx.appendChild(obx11);
 		Element obx19 = doc.createElement("OBX.19");
-		NahlnOMaticAMR.setCurrentColumn("DateOfIsolation");
+		NahlnOMaticAMR.setCurrentColumn("Date Of Isolation");
 		obx19.setTextContent(DateTime.formatDate(row.getDateofIsolation(), false));
 		obx.appendChild(obx19);
 		EI obx21 = new EI(doc, "OBX.21", UniqueID.getUniqueID("Result"), ConfigFile.getNahlnOMaticOID(), "ISO" );

@@ -71,7 +71,7 @@ public class ROL extends HL7Object {
 	}
 	
 	private String getState() throws ConfigException {
-		NahlnOMaticAMR.setCurrentColumn("StateOfOrigin");
+		NahlnOMaticAMR.setCurrentColumn("State Of Origin");
 		String sRet = row.getStateofAnimalOrigin();
 		return sRet;
 	}	

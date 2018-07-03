@@ -58,7 +58,7 @@ public class Specimen extends HL7Object {
 	private void addSPM2() throws DOMException, ConfigException, XMLException {
 		Element spm2 = doc.createElement("SPM.2");
 		spm.appendChild(spm2);
-		NahlnOMaticAMR.setCurrentColumn("SpecimenID");
+		NahlnOMaticAMR.setCurrentColumn("Specimen ID");
 		EI eip1 = new EI(doc, "EIP.1", row.getUniqueSpecimenID(), ConfigFile.getProgramOID(),"ISO");
 		spm2.appendChild(eip1.toElement());
 		EI eip2 = new EI(doc, "EIP.2", UniqueID.getUniqueID("SPM"), ConfigFile.getNahlnOMaticOID(), "ISO");
@@ -67,7 +67,7 @@ public class Specimen extends HL7Object {
 	
 	private void addSPM4() throws XMLException, ConfigException {
 		SnomedMap snomed = NahlnOMaticAMR.snomedMap;
-		NahlnOMaticAMR.setCurrentColumn("SpecimenType");
+		NahlnOMaticAMR.setCurrentColumn("Specimen Type");
 		CWE spm4 = snomed.getCWE(doc, "SPM.4", row.getSpecimen());
 		spm.appendChild(spm4.toElement());
 	}
@@ -83,14 +83,14 @@ public class Specimen extends HL7Object {
 		Element spm17 = doc.createElement("SPM.17");
 		Element dr1 = doc.createElement("DR.1");
 		spm17.appendChild(dr1);
-		NahlnOMaticAMR.setCurrentColumn("DateOfIsolation");
+		NahlnOMaticAMR.setCurrentColumn("Date Of Isolation");
 		dr1.setTextContent(DateTime.formatDate(row.getDateofIsolation(), false));
 		spm.appendChild(spm17);
 	}
 	
 	private void addSPM18() throws XMLException, ConfigException {
 		Element spm18 = doc.createElement("SPM.18");
-		NahlnOMaticAMR.setCurrentColumn("DateOfIsolation");
+		NahlnOMaticAMR.setCurrentColumn("Date Of Isolation");
 		spm18.setTextContent(DateTime.formatDate(row.getDateofIsolation(), false));
 		spm.appendChild(spm18);
 	}

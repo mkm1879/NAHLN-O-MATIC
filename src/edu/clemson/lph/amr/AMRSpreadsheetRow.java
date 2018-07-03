@@ -65,6 +65,7 @@ public class AMRSpreadsheetRow {
 			logger.error("Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
 					+ "\r\n Error: " + e.getMessage()
 					+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
+					+ "\r\n Column: " + NahlnOMaticAMR.getCurrentColumn()
 					+ "\r\n Row:\r\n" + NahlnOMaticAMR.getCurrentRow().toString(), e);
 			MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
 					+ "\r\n Error: " + e.getMessage()
