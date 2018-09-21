@@ -18,14 +18,11 @@ package edu.clemson.lph.amr;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import edu.clemson.lph.amr.exceptions.ConfigException;
 import edu.clemson.lph.amr.exceptions.DataException;
@@ -34,7 +31,6 @@ import edu.clemson.lph.amr.segments.AccDetail;
 import edu.clemson.lph.amr.segments.MSH;
 import edu.clemson.lph.amr.segments.PV1;
 import edu.clemson.lph.amr.segments.ROL;
-import edu.clemson.lph.utils.XMLUtility;
 
 /**
  * 

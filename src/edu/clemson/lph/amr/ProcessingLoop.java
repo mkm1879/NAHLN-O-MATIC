@@ -74,18 +74,12 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 		catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-
 		try {
-			while( !bCancel ) {
-				synchronized (this) {
-					try {
-						step();
-						wait(ConfigFile.getPollSeconds() * 1000 );
-					}
-					catch (InterruptedException ex) {
-					}
-				}
-			}
+			IntPair retVal = step();
+			prog.setVisible(false);
+			prog.dispose();
+			MessageDialog.showMessage(null, "NAHLN-O-MATIC_AMR", retVal.iAccept + " files accepted\n"
+					+ retVal.iFail + " files failed");
 		}
 		catch( Throwable e ) {
 			logger.error("Unexpected exception in main loop", e);
@@ -115,8 +109,9 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 
 	}
 	
-	private void step() {
+	private IntPair step() {
 		Sender sender = null;
+		IntPair retVal = new IntPair();
 		try {
 			if(ConfigFile.isSHICHost() )
 				sender = new SHICPostSender();
@@ -128,11 +123,11 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 		File fDirIn = new File(sInbox);
 		File fDirOut = new File(sOutbox);
 		File fDirErrors = new File(sErrorsbox);
+		
 		for( File fFile : fDirIn.listFiles() ) {
 			try {
 				NahlnOMaticAMR.setCurrentFile(fFile);
 				updateProgress("Reading " + fFile.getName(), "Progress ...");
-				pause();
 				AMRWorkbook sheet = new AMRWorkbook(fFile);
 				NahlnOMaticAMR.setCurrentSheet(sheet);
 				boolean bHasErrors = false;
@@ -147,20 +142,22 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 						String sMsg = opu.toXMLString();
 						String sID = opu.getUniqueSpecimen();
 						updateProgress("Sending " + fFile.getName() + "_" + sID, "Progress ...");
-						pause();
+//						pause();
 						String sRet = sender.send(sMsg);
 						String sMsgFile = null;
 						String sAckFile = null;
 						if(sRet.contains("<MSA.1>AA</MSA.1>")) {
+							retVal.iAccept++;
 							updateProgress(fFile.getName() + "_" + sID + " Accepted", "Waiting ...");
-							pause();
+//							pause();
 							sMsgFile = fDirOut.getAbsolutePath() + "/" + fFile.getName() + "_" + sID + ".xml";
 							sAckFile = fDirOut.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + "_ACK.xml";
 						}
 						else {
+							retVal.iFail++;
 							bHasErrors = true;
 							updateProgress(fFile.getName() + "_" + sID + " contained errors", "Waiting ...");
-							pause();
+//							pause();
 							sMsgFile = fDirErrors.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + ".xml";
 							sAckFile = fDirErrors.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + "_ACK.xml";
 						}
@@ -187,6 +184,7 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 				FileUtils.move( fFile, fDirErrors );
 			}
 		}
+		return retVal;
 	}
 	
 	private void pause() {
@@ -203,5 +201,15 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 		bCancel = true;
 		this.interrupt();
 	}
+	
+	private class IntPair {
+		public int iAccept;
+		public int iFail;
+		
+		public IntPair() {
+			iAccept = 0;
+			iFail = 0;
+		}
+	};
 
 }
