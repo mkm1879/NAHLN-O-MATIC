@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import edu.clemson.lph.amr.datatypes.DateTime;
 import edu.clemson.lph.amr.exceptions.ConfigException;
 
 /**
@@ -41,7 +40,6 @@ public class AMRWorkbook {
 			e.printStackTrace();
 		}
 	}
-	private static File myFile = null;
 	
 	private Workbook workbook = null;
 	private PeekingIterator<Sheet> sheetIterator;

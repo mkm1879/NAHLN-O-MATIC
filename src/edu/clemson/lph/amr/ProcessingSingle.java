@@ -15,28 +15,22 @@
 package edu.clemson.lph.amr;
 
 import java.io.File;
-import java.io.IOException;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
 import edu.clemson.lph.amr.exceptions.ConfigException;
-import edu.clemson.lph.amr.exceptions.HL7Exception;
-import edu.clemson.lph.amr.exceptions.XMLException;
 import edu.clemson.lph.dialogs.MessageDialog;
 import edu.clemson.lph.dialogs.ProgressDialog;
-import edu.clemson.lph.dialogs.ThreadCancelListener;
 import edu.clemson.lph.utils.FileUtils;
 import edu.clemson.lph.utils.UniqueID;
 
 /**
  * 
  */
-public class ProcessingLoop extends Thread implements ThreadCancelListener {
+public class ProcessingSingle extends Thread {
 	public static final Logger logger = Logger.getLogger(NahlnOMaticAMR.class.getName());
 	private ProgressDialog prog;
-	private boolean bCancel = false;
 	private String sInbox;
 	private String sOutbox;
 	private String sErrorsbox;
@@ -45,9 +39,8 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 	 * @throws ConfigException 
 	 * 
 	 */
-	public ProcessingLoop() throws ConfigException {
+	public ProcessingSingle() throws ConfigException {
 		prog = new ProgressDialog(null, "NAHLN-O-MATIC_AMR", "Ready to process");
-		prog.setCancelListener(this);
 		prog.setAuto(true);
 		prog.setVisible(true);
 		sInbox = ConfigFile.getInBox();
@@ -58,19 +51,11 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 	@Override
 	public void run() {
 		try {
-			while( !bCancel ) {
-				synchronized (this) {
-					try {
-						IntPair retVal = step();
-						if(retVal.iAccept > 0 || retVal.iFail > 0 )
-							updateProgress( retVal.iAccept + " messages accepted\n"
-									+ retVal.iFail + " messages failed", "Progress ...");
-						wait(ConfigFile.getPollSeconds() * 1000 );
-					}
-					catch (InterruptedException ex) {
-					}
-				}
-			}
+			IntPair retVal = step();
+			prog.setVisible(false);
+			prog.dispose();
+			MessageDialog.showMessage(null, "NAHLN-O-MATIC_AMR", retVal.iAccept + " messages accepted\n"
+					+ retVal.iFail + " messages failed");
 		}
 		catch( Throwable e ) {
 			logger.error("Unexpected exception in main loop", e);
@@ -114,34 +99,34 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 		File fDirIn = new File(sInbox);
 		File fDirOut = new File(sOutbox);
 		File fDirErrors = new File(sErrorsbox);
+		
 		for( File fFile : fDirIn.listFiles() ) {
 			try {
 				NahlnOMaticAMR.setCurrentFile(fFile);
 				updateProgress("Reading " + fFile.getName(), "Progress ...");
-				pause();
 				AMRWorkbook sheet = new AMRWorkbook(fFile);
 				NahlnOMaticAMR.setCurrentSheet(sheet);
 				boolean bHasErrors = false;
+				String sID = null;
 				while( sheet.hasNextSheet() ) {
 					sheet.nextSheet();
+					String sSheetName = sheet.getCurrentSheetName();
 					updateProgress( "Processing " + sheet.getCurrentSheetName(), "Progress ...");
 					NahlnOMaticAMR.setCurrentTab(sheet.getCurrentSheetName());
 					while( sheet.hasNextRow() ) {
+						try {
 						AMRSpreadsheetRow row = sheet.nextRow();
 						NahlnOMaticAMR.setCurrentRow(row);
-						
 						OpuR25Document opu = new OpuR25Document(row);
 						String sMsg = opu.toXMLString();
-						String sID = opu.getUniqueSpecimen();
-						updateProgress("Sending " + fFile.getName() + "_" + sID, "Progress ...");
-						pause();
+						sID = opu.getUniqueSpecimen();
+						updateProgress("Sending " + fFile.getName() + "\n" + sSheetName + "\n" + sID, "Progress ...");
 						String sRet = sender.send(sMsg);
 						String sMsgFile = null;
 						String sAckFile = null;
 						if(sRet.contains("<MSA.1>AA</MSA.1>")) {
 							retVal.iAccept++;
-							updateProgress(fFile.getName() + "_" + sID + " Accepted", "Waiting ...");
-							pause();
+							updateProgress(fFile.getName() + "\n" + sSheetName + "\n" + sID + " Accepted", "Waiting ...");
 							sMsgFile = fDirOut.getAbsolutePath() + "/" + fFile.getName() + "_" + sID + ".xml";
 							sAckFile = fDirOut.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + "_ACK.xml";
 						}
@@ -149,12 +134,15 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 							retVal.iFail++;
 							bHasErrors = true;
 							updateProgress(fFile.getName() + "_" + sID + " contained errors", "Waiting ...");
-							pause();
 							sMsgFile = fDirErrors.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + ".xml";
 							sAckFile = fDirErrors.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + "_ACK.xml";
 						}
 						FileUtils.writeTextFile(sMsg, sMsgFile);
 						FileUtils.writeTextFile(sRet, sAckFile);
+						} catch( Exception e) {
+							retVal.iFail++;
+							MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR",  fFile.getName() + "_" + sID + " contained errors");
+						}
 					}
 				}
 				if( bHasErrors )
@@ -162,12 +150,12 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 				else
 					FileUtils.move( fFile, fDirOut );
 			} catch (Throwable e) {
-				logger.error("Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName()
+				logger.error("Error while processing " + NahlnOMaticAMR.getCurrentFile().getName()
 						+ "\r\n Error: " + e.getMessage()
 						+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
 						+ "\r\n Column: " + NahlnOMaticAMR.getCurrentColumn()
 						+ "\r\n Row:\r\n" + NahlnOMaticAMR.getCurrentRow().toString(), e);
-				MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Error in main loop while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
+				MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Error while processing " + NahlnOMaticAMR.getCurrentFile().getName() 
 						+ "\r\n Error: " + e.getMessage()
 						+ "\r\n Sheet: " + NahlnOMaticAMR.getCurrentTab()
 						+ "\r\n Column: " + NahlnOMaticAMR.getCurrentColumn()
@@ -185,13 +173,5 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 		} catch( InterruptedException e) {}
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.clemson.lph.dialogs.ThreadCancelListener#cancelThread()
-	 */
-	@Override
-	public void cancelThread() {
-		bCancel = true;
-		this.interrupt();
-	}
 
 }

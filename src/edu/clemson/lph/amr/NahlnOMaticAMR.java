@@ -17,6 +17,8 @@ package edu.clemson.lph.amr;
 
 import java.io.File;
 
+import javax.swing.UIManager;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -80,19 +82,42 @@ public class NahlnOMaticAMR {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ProcessingLoop loop;
 		try {
 			logger.setLevel(ConfigFile.getLogLevel());
 			logger.info("Starting NAHLN-O-MATIC_AMR");
-			snomedMap = new SnomedMap();
-			loincMap = new LoincMap();
-			loop = new ProcessingLoop();
-			loop.start();
+			String os = System.getProperty("os.name");
+			if( os.toLowerCase().contains("mac os") ) {
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+						"Civet");
+				System.setProperty("com.apple.mrj.application.growbox.intrudes",
+						"false");
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			}
+			else {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
 		} catch (ConfigException e) {
 			// Record everywhere:  console, log, dialog
 			e.printStackTrace();
 			logger.error(e);
 			MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Configuration error: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		try {
+			snomedMap = new SnomedMap();
+			loincMap = new LoincMap();
+			if( args.length > 0 && args[0].equalsIgnoreCase("ROBOT") ) {
+				ProcessingLoop loop = new ProcessingLoop();
+				loop.start();
+			}
+			else {
+				ProcessingSingle single = new ProcessingSingle();
+				single.start();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
 		}
 	}
 
