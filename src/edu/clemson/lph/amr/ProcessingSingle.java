@@ -54,9 +54,13 @@ public class ProcessingSingle extends Thread {
 			IntPair retVal = step();
 			prog.setVisible(false);
 			prog.dispose();
-			MessageDialog.showMessage(null, "NAHLN-O-MATIC_AMR", retVal.iAccept + " messages accepted\n"
+			MessageDialog msg = new MessageDialog(null, "NAHLN-O-MATIC_AMR", retVal.iAccept + " messages accepted\n"
 					+ retVal.iFail + " messages failed");
+			msg.setButtons(MessageDialog.OK_ONLY);
+			msg.setModal(true);
+			msg.setVisible(true);
 		}
+		
 		catch( Throwable e ) {
 			logger.error("Unexpected exception in main loop", e);
 			MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR", "Unexpected exception in main loop");
