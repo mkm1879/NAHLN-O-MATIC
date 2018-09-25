@@ -156,12 +156,12 @@ public class ProgressDialog extends JDialog {
 	   * @throws Exception
 	   */
 	  private void initGUI() throws Exception {
-	    lProgress.setBounds(269, 95, 106, 22);
+	    lProgress.setBounds(295, 105, 106, 22);
 	    lProgress.setText(sProgLabel);
-	    jProgressBar1.setBounds(109, 93, 150, 24);
+	    jProgressBar1.setBounds(109, 129, 150, 24);
 	    jProgressBar1.setMaximum(iMax);
 	    jProgressBar1.setMinimum(0);
-	    lMsg.setBounds(10, 22, 391, 60);
+	    lMsg.setBounds(10, 22, 391, 76);
 	    lMsg.setLineWrap(true);
 	    lMsg.setWrapStyleWord(true);
 	    lMsg.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -175,7 +175,7 @@ public class ProgressDialog extends JDialog {
 	    panel1.add(lProgress);
 	    
 	    btnCancel = new JButton("Cancel");
-	    btnCancel.setBounds(168, 150, 91, 23);
+	    btnCancel.setBounds(168, 180, 91, 23);
 	    panel1.add(btnCancel);
 	    btnCancel.addActionListener(new ActionListener() {
 			@Override
