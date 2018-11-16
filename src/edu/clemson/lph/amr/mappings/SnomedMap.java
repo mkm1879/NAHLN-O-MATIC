@@ -68,6 +68,9 @@ public class SnomedMap {
 					}
 				}
 			}
+		}catch( IllegalStateException e ) {
+			logger.warn("Numeric cell read as string loading SnomedMap", e);
+			e.printStackTrace();
 		}catch( Exception e ) {
 			logger.error(e);
 			e.printStackTrace();
