@@ -42,6 +42,12 @@ public class AMRResult {
 			cChar = sMIC.charAt(++iChar);
 		}
 		String sNum = sMIC.substring(iChar);
+		// For those spreadsheets that list both components of combined drug
+		// use just the primary (first value).  / is separator, NOT division.
+		if( sNum.contains("/") ) {
+			int iEnd = sNum.indexOf("/");
+			sNum = sNum.substring(0,iEnd);
+		}
 		try {
 			dMICValue = Double.parseDouble(sNum);
 		} catch( NumberFormatException nfe ) {
