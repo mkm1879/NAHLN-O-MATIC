@@ -23,6 +23,7 @@ import java.util.Iterator;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -61,7 +62,19 @@ public class SnomedMap {
 						Cell c = row.getCell(0);
 						String sLocal = c.getStringCellValue();
 						c = row.getCell(1);
-						String sCode = c.getStringCellValue();
+						String sCode = null;
+						CellType iType = c.getCellTypeEnum();
+						if( iType == CellType.NUMERIC ) {
+							double dCode = c.getNumericCellValue();
+							long lCode = (long)dCode;
+							sCode = Long.toString(lCode);
+						}
+						else {
+							sCode = c.getStringCellValue();
+						}
+						if( sCode == null ) {
+							logger.error("No SNOMED Code Found For: " + sLocal );
+						}
 						c = row.getCell(2);
 						String sValue = c.getStringCellValue();
 						hMap.put(sLocal, new CodeValue(sCode, sValue));
@@ -90,23 +103,29 @@ public class SnomedMap {
 		}
 	}
 	
-	public CWE getCWE(Document doc, String sTag, String sLocal) throws XMLException {
+	public CWE getCWE(Document doc, String sTag, String ssLocal) throws XMLException {
 		CWE cwe = null;
+		String sLocal = ssLocal.trim();
 		CodeValue cv = hMap.get(sLocal);
 		if(cv == null && "SPM.4".equals(sTag) )
 			cv = new CodeValue("123038009","Specimen (specimen)");
 		if( cv != null )
 			cwe = new CWE(doc, sTag, cv.code, cv.value, "SCT", sLocal);
-		else
+		else {
 			cwe = new CWE(doc, sTag, sLocal);
+			logger.error("No SNOMED Code found for '" + ssLocal + "'");
+		}
 		return cwe;
 	}
 	
-	public CWE getCWE(Document doc, String sTag, String sLocal, String sSerotype) throws XMLException {
+	public CWE getCWE(Document doc, String sTag, String ssLocal, String sSerotype) throws XMLException {
 		CWE cwe = null;
+		String sLocal = ssLocal.trim();
 		String sSpSerotype;
-		if( sSerotype != null && sSerotype.trim().length() > 0 )
+		if( sSerotype != null && sSerotype.trim().length() > 0 ) {
+			sSerotype = sSerotype.trim();
 			sSpSerotype = sLocal + " " + sSerotype;
+		}
 		else
 			sSpSerotype = sLocal;
 		CodeValue cv = hMap.get(sSpSerotype);
@@ -114,8 +133,10 @@ public class SnomedMap {
 			cv = hMap.get(sLocal);
 		if( cv != null )
 			cwe = new CWE(doc, sTag, cv.code, cv.value, "SCT", sSpSerotype);
-		else
+		else {
 			cwe = new CWE(doc, sTag, sSpSerotype);
+			logger.error("No SNOMED Code found for '" + ssLocal  + "' '" + sSerotype + "'");
+		}
 		return cwe;
 	}
 }

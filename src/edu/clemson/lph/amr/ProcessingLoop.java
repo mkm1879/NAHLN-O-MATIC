@@ -146,6 +146,7 @@ public class ProcessingLoop extends Thread implements ThreadCancelListener {
 							sAckFile = fDirOut.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + "_ACK.xml";
 						}
 						else {
+							System.err.println(sRet);
 							retVal.iFail++;
 							bHasErrors = true;
 							updateProgress(fFile.getName() + "_" + sID + " contained errors", "Waiting ...");

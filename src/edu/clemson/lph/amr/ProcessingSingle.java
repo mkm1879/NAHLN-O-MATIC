@@ -135,6 +135,7 @@ public class ProcessingSingle extends Thread {
 							sAckFile = fDirOut.getAbsolutePath() + "/"  + fFile.getName() + "_" + sID + "_ACK.xml";
 						}
 						else {
+							System.err.println(sRet);
 							retVal.iFail++;
 							bHasErrors = true;
 							updateProgress(fFile.getName() + "_" + sID + " contained errors", "Waiting ...");
@@ -144,8 +145,9 @@ public class ProcessingSingle extends Thread {
 						FileUtils.writeTextFile(sMsg, sMsgFile);
 						FileUtils.writeTextFile(sRet, sAckFile);
 						} catch( Exception e) {
+							e.printStackTrace();
 							retVal.iFail++;
-							MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR",  fFile.getName() + "_" + sID + " contained errors");
+							MessageDialog.messageWait(null, "NAHLN-O-MATIC_AMR",  fFile.getName() + "_" + sID + " contained fatal errors");
 						}
 					}
 				}
