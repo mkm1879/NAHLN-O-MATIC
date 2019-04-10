@@ -193,12 +193,7 @@ public class AMRSpreadsheetRow {
 			throw new ConfigException("Date of Isolation not found in column K");
 		Cell c = row.getCell(10);
 		if( c != null ) {
-			try {
-				Double dVal = c.getNumericCellValue();
-				dRet = DateUtil.getJavaDate(dVal);
-			} catch(Exception e) {
-				throw new ConfigException("Date field not valid date");
-			}
+			dRet = (new DateCell(c)).toDate();
 		}
 		return dRet;
 	}
@@ -209,11 +204,8 @@ public class AMRSpreadsheetRow {
 		if( !sHeader.startsWith("Date Tested") )
 			throw new ConfigException("Date Tested not found in column L");
 		Cell c = row.getCell(11);
-		try {
-			Double dVal = c.getNumericCellValue();
-			dRet = DateUtil.getJavaDate(dVal);
-		} catch(Exception e) {
-			throw new ConfigException("Date field not valid date");
+		if( c != null ) {
+			dRet = (new DateCell(c)).toDate();
 		}
 		return dRet;
 	}
@@ -226,7 +218,7 @@ public class AMRSpreadsheetRow {
 		StringBuffer sb = new StringBuffer();
 		int iCol = 0;
 		String sHeadAb = headers.get(iCol);
-		while( sHeadAb != null && sHeadAb.trim().length() > 0 && iCol < headers.size() ) {
+		while( sHeadAb != null && sHeadAb.trim().length() > 0 && iCol < headers.size() - 1 ) {
 			sb.append(headers.get(iCol));
 			sb.append('=');
 			Cell cell = row.getCell(iCol);
