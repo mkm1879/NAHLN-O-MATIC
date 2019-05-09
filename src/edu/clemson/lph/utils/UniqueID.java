@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -39,7 +40,7 @@ public class UniqueID {
 	 * 
 	 */
 	public static String getUniqueID(String sPrefix) {
-		Integer iRet = null;
+		Integer iRet = 1000000;
 		String sRet = null;
 		if(pSessionIDs == null) {
 			pSessionIDs = new Properties();
@@ -52,9 +53,13 @@ public class UniqueID {
 		}
 		sRet = pSessionIDs.getProperty(sPrefix);
 		if( sRet == null ) {
-			sRet = "1";
+			sRet = seedValue();
 		}
-		iRet = Integer.parseInt(sRet);
+		try {
+			iRet = Integer.parseInt(sRet);
+		} catch( NumberFormatException nfe ) {
+			logger.error("Cannot parse " + sRet + " as an integer");
+		}
 		pSessionIDs.put(sPrefix, Integer.toString(iRet + 1));
 		return sRet;
 	}
@@ -73,6 +78,14 @@ public class UniqueID {
 			logger.error("Could not write UniqueIDs.txt", e);
 			e.printStackTrace();
 		}
+	}
+	
+	private static String seedValue() {
+		String sRet = "1";
+		SimpleDateFormat dfJulian = new SimpleDateFormat("yyD");
+		java.util.Date dNow = new java.util.Date();
+		sRet = dfJulian.format(dNow);
+		return sRet;
 	}
 	
 }
