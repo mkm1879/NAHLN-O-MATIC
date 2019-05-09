@@ -112,8 +112,12 @@ public class NahlnOMaticAMR {
 				ProcessingLoop loop = new ProcessingLoop();
 				loop.start();
 			}
+			else if( args.length > 0 && args[0].equalsIgnoreCase("HEADLESS") ) {
+				ProcessingSingle single = new ProcessingSingle(true);
+				single.start();
+			}
 			else {
-				ProcessingSingle single = new ProcessingSingle();
+				ProcessingSingle single = new ProcessingSingle(false);
 				single.start();
 			}
 		} catch (Exception e) {

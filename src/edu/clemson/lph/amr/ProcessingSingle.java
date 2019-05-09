@@ -34,15 +34,19 @@ public class ProcessingSingle extends Thread {
 	private String sInbox;
 	private String sOutbox;
 	private String sErrorsbox;
+	private boolean bHeadless = false;
 
 	/**
 	 * @throws ConfigException 
 	 * 
 	 */
-	public ProcessingSingle() throws ConfigException {
-		prog = new ProgressDialog(null, "NAHLN-O-MATIC_AMR", "Ready to process");
-		prog.setAuto(true);
-		prog.setVisible(true);
+	public ProcessingSingle(boolean bHeadless ) throws ConfigException {
+		this.bHeadless = bHeadless;
+		if( !bHeadless ) {
+			prog = new ProgressDialog(null, "NAHLN-O-MATIC_AMR", "Ready to process");
+			prog.setAuto(true);
+			prog.setVisible(true);
+		}
 		sInbox = ConfigFile.getInBox();
 		sOutbox = ConfigFile.getOutBox();
 		sErrorsbox = ConfigFile.getErrorsBox();
@@ -52,13 +56,15 @@ public class ProcessingSingle extends Thread {
 	public void run() {
 		try {
 			IntPair retVal = step();
-			prog.setVisible(false);
-			prog.dispose();
-			MessageDialog msg = new MessageDialog(null, "NAHLN-O-MATIC_AMR", retVal.iAccept + " messages accepted\n"
-					+ retVal.iFail + " messages failed");
-			msg.setButtons(MessageDialog.OK_ONLY);
-			msg.setModal(true);
-			msg.setVisible(true);
+			if( !bHeadless ) {
+				prog.setVisible(false);
+				prog.dispose();
+				MessageDialog msg = new MessageDialog(null, "NAHLN-O-MATIC_AMR", retVal.iAccept + " messages accepted\n"
+						+ retVal.iFail + " messages failed");
+				msg.setButtons(MessageDialog.OK_ONLY);
+				msg.setModal(true);
+				msg.setVisible(true);
+			}
 		}
 		
 		catch( Throwable e ) {
@@ -73,6 +79,8 @@ public class ProcessingSingle extends Thread {
 	}
 	
 	private void updateProgress( String sProgMsg, String sProgLabel ) {
+		if( bHeadless )
+			return;
 		synchronized (prog) {
 			try {
 				SwingUtilities.invokeLater(new Runnable() {
@@ -151,6 +159,7 @@ public class ProcessingSingle extends Thread {
 						}
 					}
 				}
+				sheet.close();
 				if( bHasErrors )
 					FileUtils.move( fFile, fDirErrors );
 				else

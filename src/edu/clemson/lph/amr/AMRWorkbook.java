@@ -16,6 +16,7 @@ package edu.clemson.lph.amr;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -73,6 +74,10 @@ public class AMRWorkbook {
 				bRet = false;
 		}
 		return bRet;
+	}
+	
+	public void close() throws IOException {
+		workbook.close();
 	}
 	
 	public Sheet nextSheet() {
