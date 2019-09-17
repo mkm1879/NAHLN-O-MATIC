@@ -114,7 +114,9 @@ public class AMRWorkbook {
 		if(bRet) {
 			Row nextRow = rowIterator.peek();
 			Cell cFirst = nextRow.getCell(0);
-			if(cFirst.getCellTypeEnum() != CellType.STRING )
+			if( cFirst == null )
+				bRet = false;
+			else if(cFirst.getCellTypeEnum() != CellType.STRING )
 				bRet = false;
 			else {
 				String sValue = cFirst.getStringCellValue();
